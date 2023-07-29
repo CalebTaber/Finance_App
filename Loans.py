@@ -120,32 +120,32 @@ def plot_loan_repayment_schedule():
     plot_btn = widgets.Button(description='Plot')
     output = widgets.Output()
 
-    def plot_repayment(button):
-        output.clear_output()
 
-        loan_objs = list()
-        for i in range(0, len(loans_adjusted)):
-            loan_i = loans_adjusted.iloc[i]
-            l = Loan(loan_i['LoanID'], loan_i['Principal_Balance'], loan_i['Interest_Rate'], loan_i['Accrued_Interest'])
-            loan_objs.append(l)
+def plot_repayment(button):
+    output.clear_output()
 
-        with output:
-            repayment_schedule = optimize_loan_repayment(loans=loan_objs, monthly_payment=monthly_slider.value, begin_date=startdate_picker.value,
-                                                         deposit_amt=deposit_slider.value)
+    loan_objs = list()
+    for i in range(0, len(loans_adjusted)):
+        loan_i = loans_adjusted.iloc[i]
+        l = Loan(loan_i['LoanID'], loan_i['Principal_Balance'], loan_i['Interest_Rate'], loan_i['Accrued_Interest'])
+        loan_objs.append(l)
 
-        fig = go.Figure()
+    with output:
+        repayment_schedule = optimize_loan_repayment(loans=loan_objs, monthly_payment=monthly_slider.value, begin_date=startdate_picker.value,
+                                                     deposit_amt=deposit_slider.value)
 
-        for loanID in repayment_schedule['LoanID'].unique():
-            plot_data = repayment_schedule[repayment_schedule['LoanID'] == loanID][['Date', 'Outstanding_Balance']]
-            fig.add_trace(go.Scatter(x=plot_data['Date'], y=plot_data['Outstanding_Balance'], mode='lines', name=loanID))
+    fig = go.Figure()
 
-        fig.update_layout(width=1500, height=500)
+    for loanID in repayment_schedule['LoanID'].unique():
+        plot_data = repayment_schedule[repayment_schedule['LoanID'] == loanID][['Date', 'Outstanding_Balance']]
+        fig.add_trace(go.Scatter(x=plot_data['Date'], y=plot_data['Outstanding_Balance'], mode='lines', name=loanID))
 
-        with output:
-            print('Total paid:', round(repayment_schedule['Amount'].sum(), 2))
-            fig.show()
+    fig.update_layout(width=1500, height=500)
 
-    plot_btn.on_click(plot_repayment)
-    display(monthly_slider, deposit_slider, startdate_picker, plot_btn, output)
+    with output:
+        print('Total paid:', round(repayment_schedule['Amount'].sum(), 2))
+        fig.show()
 
 
+plot_btn.on_click(plot_repayment)
+display(monthly_slider, deposit_slider, startdate_picker, plot_btn, output)
