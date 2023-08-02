@@ -6,6 +6,7 @@ from gi.repository import Gtk
 
 DATE_DEFAULT = datetime.date(year=1970, month=1, day=1)
 
+
 class DatePicker(Gtk.Box):
     calendar = Gtk.Calendar()
     selected_date = DATE_DEFAULT
@@ -31,11 +32,16 @@ class DatePicker(Gtk.Box):
         selection = datetime.date(year=date_tuple[0], month=date_tuple[1] + 1, day=date_tuple[2])
 
         # If the user is not just changing the month in the calendar, set the current selection as the date
-        if not (self.selected_date == DATE_DEFAULT or
-                (selection.month == self.selected_date.month - 1 or
-                 selection.year == self.selected_date.year - 1) or
-                (selection.month == self.selected_date.month + 1 or
-                 selection.year == self.selected_date.year + 1)):
+        is_first_update = self.selected_date == DATE_DEFAULT
+
+        prev_selection = datetime.date.today() if is_first_update else self.selected_date
+
+        month_changed = ((selection.month == prev_selection.month - 1 or
+                         selection.year == prev_selection.year - 1) or
+                         (selection.month == prev_selection.month + 1 or
+                          selection.year == prev_selection.year + 1))
+
+        if (is_first_update and not month_changed) or (not is_first_update and not month_changed):
             self.calendar.set_visible(False)
             self.select_button.set_label(selection.strftime("%b %d, %Y"))
             self.select_button.set_visible(True)
