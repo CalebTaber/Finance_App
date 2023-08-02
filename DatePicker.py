@@ -37,7 +37,7 @@ class DatePicker(Gtk.Box):
         # Prevent automatically selecting a date when the user changes the month in the calendar
         if not month_changed:
             self.calendar.set_visible(False)
-            self.select_button.set_label(selection.strftime("%b %d, %Y"))
+            self.select_button.set_label(selection.strftime("%B %d, %Y"))
             self.select_button.set_visible(True)
 
         self.selected_date = selection
