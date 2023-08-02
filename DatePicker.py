@@ -28,20 +28,14 @@ class DatePicker(Gtk.Box):
         self.calendar.set_visible(True)
 
     def on_date_chosen(self, widget):
-        date_tuple = self.calendar.get_date()
-        selection = datetime.date(year=date_tuple[0], month=date_tuple[1] + 1, day=date_tuple[2])
+        (year, month, day) = self.calendar.get_date()
+        selection = datetime.date(year=year, month=month + 1, day=day)
 
-        # If the user is not just changing the month in the calendar, set the current selection as the date
-        is_first_update = self.selected_date == DATE_DEFAULT
+        prev_selection = datetime.date.today() if self.selected_date == DATE_DEFAULT else self.selected_date
+        month_changed = abs(selection.month - prev_selection.month) == 1 or abs(selection.year - prev_selection.year) == 1
 
-        prev_selection = datetime.date.today() if is_first_update else self.selected_date
-
-        month_changed = ((selection.month == prev_selection.month - 1 or
-                         selection.year == prev_selection.year - 1) or
-                         (selection.month == prev_selection.month + 1 or
-                          selection.year == prev_selection.year + 1))
-
-        if (is_first_update and not month_changed) or (not is_first_update and not month_changed):
+        # Prevent automatically selecting a date when the user changes the month in the calendar
+        if not month_changed:
             self.calendar.set_visible(False)
             self.select_button.set_label(selection.strftime("%b %d, %Y"))
             self.select_button.set_visible(True)
