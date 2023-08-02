@@ -22,6 +22,7 @@ class TransactionInputForm(Gtk.Box):
 
         self.submitBtn.connect("clicked", self.on_submit)
         self.add(self.submitBtn)
+        print(self.get_window())
 
     def on_submit(self, widget):
         print("Submitted!")

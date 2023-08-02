@@ -7,7 +7,6 @@ from gi.repository import Gtk
 
 class MainWindow(Gtk.Window):
     layout = Gtk.FlowBox()
-
     def __init__(self):
         super().__init__(title="Finance App")
         self.set_default_size(500, 400)
