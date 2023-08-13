@@ -12,9 +12,12 @@ class TransactionInputForm(Gtk.Box):
     categoryEntry = Gtk.ComboBox()
     submitBtn = Gtk.Button(label="Submit")
 
-    def __init__(self):
-        super().__init__(self)
+    def __init__(self, window_height):
+        super().__init__(self, width_request=225, height_request=window_height)
         self.set_orientation(Gtk.Orientation.VERTICAL)
+        self.set_spacing(5)
+        self.set_homogeneous(False)
+
         self.add(self.datePicker)
         self.add(self.amountEntry)
         self.add(self.locationEntry)
