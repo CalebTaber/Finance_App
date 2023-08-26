@@ -11,6 +11,7 @@ class DatePicker(Gtk.Box):
     calendar = Gtk.Calendar(visible=True)
     selected_date = DATE_DEFAULT
     select_button = Gtk.Button(visible=True)
+    isPicked = False
 
     def __init__(self):
         super().__init__()
@@ -24,6 +25,7 @@ class DatePicker(Gtk.Box):
     def on_choose_date(self, widget):
         self.remove(self.select_button)
         self.add(self.calendar)
+        self.isPicked = False
 
     def on_date_chosen(self, widget):
         (year, month, day) = self.calendar.get_date()
@@ -37,5 +39,6 @@ class DatePicker(Gtk.Box):
             self.remove(self.calendar)
             self.select_button.set_label(selection.strftime("%B %d, %Y"))
             self.add(self.select_button)
+            self.isPicked = True
 
         self.selected_date = selection

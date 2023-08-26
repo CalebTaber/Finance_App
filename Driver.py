@@ -16,8 +16,8 @@ class MainWindow(Gtk.Window):
         self.set_default_size(500, 400)
         self.layout.set_valign(Gtk.Align.START)
 
-        txnInputForm = txnInput.TransactionInputForm(WINDOW_HEIGHT)
-        self.layout.add(txnInputForm)
+        txn_input = txnInput.TransactionInputForm(WINDOW_HEIGHT)
+        self.layout.add(txn_input)
 
         self.add(self.layout)
 

@@ -6,27 +6,21 @@ from gi.repository import Gtk
 
 
 class TransactionInputForm(Gtk.Box):
-    datePicker = DatePicker.DatePicker()
-    amountEntry = Gtk.Entry(placeholder_text="Amount")
-    submitBtn = Gtk.Button(label="Submit")
+    date_input = DatePicker.DatePicker()
+    amount_input = Gtk.Entry(placeholder_text="Amount")
+    submit = Gtk.Button(label="Submit")
 
-    location_store = Gtk.ListStore(int, str)
-    location_store.append([0, "Amazon"])
-    location_store.append([1, "Giant"])
-    location_store.append([2, "Wegmans"])
-    location_store.append([3, "Shoprite"])
-    locationEntry = Gtk.ComboBox.new_with_model_and_entry(location_store)
-    locationEntry.set_entry_text_column(1)
+    locations = ['Amazon', 'Giant', 'Wegmans', 'Shoprite']
+    location_input = Gtk.ComboBoxText.new_with_entry()
+    location_input.set_entry_text_column(0)
+    for loc in locations:
+        location_input.append_text(loc)
 
-    category_store = Gtk.ListStore(int, str)
-    category_store.append([0, "Groceries"])
-    category_store.append([1, "Restaurants"])
-    category_store.append([2, "Housing"])
-    category_store.append([3, "M&T"])
-    category_store.append([4, "Personal"])
-    category_store.append([5, "Nonfood Groceries"])
-    categoryEntry = Gtk.ComboBox.new_with_model_and_entry(category_store)
-    categoryEntry.set_entry_text_column(1)
+    categories = ['Groceries', 'Restaurants', 'Housing', 'M&T', 'Personal', 'Nonfood Groceries']
+    category_input = Gtk.ComboBoxText.new_with_entry()
+    category_input.set_entry_text_column(0)
+    for cat in categories:
+        category_input.append_text(cat)
 
     def __init__(self, window_height):
         super().__init__(self, width_request=225, height_request=window_height)
@@ -34,13 +28,18 @@ class TransactionInputForm(Gtk.Box):
         self.set_spacing(5)
         self.set_homogeneous(False)
 
-        self.add(self.datePicker)
-        self.add(self.amountEntry)
-        self.add(self.locationEntry)
-        self.add(self.categoryEntry)
+        self.add(self.date_input)
+        self.add(self.amount_input)
+        self.add(self.location_input)
+        self.add(self.category_input)
 
-        self.submitBtn.connect("clicked", self.on_submit)
-        self.add(self.submitBtn)
+        self.submit.connect("clicked", self.on_submit)
+        self.add(self.submit)
 
     def on_submit(self, widget):
-        print("Submitted!")
+        if self.date_input.isPicked:
+            print(self.date_input.selected_date,
+                  self.amount_input.get_text(),
+                  self.location_input.get_active_text(),
+                  self.category_input.get_active_text(),
+                  sep='\t')
