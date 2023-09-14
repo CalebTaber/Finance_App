@@ -16,7 +16,7 @@ class MainWindow(Gtk.Window):
         self.set_default_size(500, 400)
         self.layout.set_valign(Gtk.Align.START)
 
-        txn_input = txnInput.TransactionInputForm(WINDOW_HEIGHT)
+        txn_input = txnInput.TransactionInputForm(WINDOW_HEIGHT, '/home/caleb/Documents/Finances/Dashboard/Transactions.csv')
         self.layout.add(txn_input)
 
         self.add(self.layout)
