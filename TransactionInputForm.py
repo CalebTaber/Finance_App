@@ -3,7 +3,9 @@ import DatePicker
 import pandas as pd
 import numpy as np
 
-gi.require_version("Gtk", "3.0")
+from TransactionList import TransactionList
+
+gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
 
@@ -16,27 +18,25 @@ class TransactionInputForm(Gtk.Box):
     category_input = Gtk.ComboBoxText.new_with_entry()
     category_input.set_entry_text_column(0)
 
-    transactions_df = pd.DataFrame()
-
     def __init__(self, window_height, txn_list_path):
-        super().__init__(self, width_request=225, height_request=window_height)
+        super().__init__()
+        self.set_size_request(225, window_height)
         self.set_orientation(Gtk.Orientation.VERTICAL)
         self.set_spacing(5)
         self.set_homogeneous(False)
 
-        self.add(self.date_input)
-        self.add(self.amount_input)
-        self.add(self.location_input)
-        self.add(self.category_input)
+        self.append(self.date_input)
+        self.append(self.amount_input)
+        self.append(self.location_input)
+        self.append(self.category_input)
 
         self.submit.connect("clicked", self.on_submit)
-        self.add(self.submit)
+        self.append(self.submit)
 
-        self.transactions_df = pd.read_csv(txn_list_path, sep=';')
+        self.txn_list = TransactionList(txn_file_path=txn_list_path)
 
-        locations = self.transactions_df['Location'].unique()
         loc_model = Gtk.ListStore(str)
-        for loc in np.sort([l for l in locations if str(l) != 'nan']):
+        for loc in self.txn_list.locations():
             if loc != 'nan':
                 self.location_input.append_text(str(loc))
                 loc_model.append([loc])
@@ -46,7 +46,7 @@ class TransactionInputForm(Gtk.Box):
         loc_completion.set_text_column(0)
         self.location_input.get_child().set_completion(loc_completion)
 
-        categories = np.sort(self.transactions_df['Category'].unique())
+        categories = self.txn_list.categories()
         cat_model = Gtk.ListStore(str)
         for cat in categories:
             self.category_input.append_text(str(cat))
