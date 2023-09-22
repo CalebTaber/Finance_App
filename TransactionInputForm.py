@@ -1,8 +1,5 @@
 import gi
-import DatePicker
-import pandas as pd
-import numpy as np
-
+from DatePicker import DatePicker
 from TransactionList import TransactionList
 
 gi.require_version("Gtk", "4.0")
@@ -10,7 +7,7 @@ from gi.repository import Gtk
 
 
 class TransactionInputForm(Gtk.Box):
-    date_input = DatePicker.DatePicker()
+    date_input = DatePicker()
     amount_input = Gtk.Entry(placeholder_text="Amount")
     submit = Gtk.Button(label="Submit")
     location_input = Gtk.ComboBoxText.new_with_entry()
@@ -58,9 +55,7 @@ class TransactionInputForm(Gtk.Box):
         self.category_input.get_child().set_completion(cat_completion)
 
     def on_submit(self, widget):
-        if self.date_input.isPicked:
-            print(self.date_input.selected_date,
-                  self.amount_input.get_text(),
-                  self.location_input.get_active_text(),
-                  self.category_input.get_active_text(),
-                  sep='\t')
+        self.txn_list.add_transaction([self.date_input.selected_date,
+                                       self.amount_input.get_text(),
+                                       self.location_input.get_active_text(),
+                                       self.category_input.get_active_text()])
