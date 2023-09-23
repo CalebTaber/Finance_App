@@ -13,7 +13,8 @@
 
 ### Transaction List (2/5)
 - [X] Create TransactionList class to wrap functionality
-- [ ] Method that returns a scrollable grid
+- [ ] Method that returns a scrollable grid 
+  - [X] List transactions
   - [ ] Allow all fields to be edited
   - [ ] Allow deletion of transactions
   - [ ] Update in real-time when transactions are added to the list  

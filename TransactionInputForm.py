@@ -64,5 +64,5 @@ class TransactionInputForm(Gtk.Box):
                                        [self.category_input.get_active_text().lower()] +
                                        self.description_input.get_text().split(',')])
 
-    def destroy(self):
+    def close(self):
         self.txn_list.write_to_file()
