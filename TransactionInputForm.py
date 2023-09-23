@@ -14,6 +14,7 @@ class TransactionInputForm(Gtk.Box):
     location_input.set_entry_text_column(0)
     category_input = Gtk.ComboBoxText.new_with_entry()
     category_input.set_entry_text_column(0)
+    description_input = Gtk.Entry(placeholder_text="Description")
 
     def __init__(self, window_height, txn_list_path):
         super().__init__()
@@ -26,6 +27,7 @@ class TransactionInputForm(Gtk.Box):
         self.append(self.amount_input)
         self.append(self.location_input)
         self.append(self.category_input)
+        self.append(self.description_input)
 
         self.submit.connect("clicked", self.on_submit)
         self.append(self.submit)
@@ -58,4 +60,9 @@ class TransactionInputForm(Gtk.Box):
         self.txn_list.add_transaction([self.date_input.selected_date,
                                        self.amount_input.get_text(),
                                        self.location_input.get_active_text(),
-                                       self.category_input.get_active_text()])
+                                       self.category_input.get_active_text(),
+                                       [self.category_input.get_active_text().lower()] +
+                                       self.description_input.get_text().split(',')])
+
+    def destroy(self):
+        self.txn_list.write_to_file()
