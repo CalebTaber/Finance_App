@@ -7,7 +7,7 @@ from gi.repository import Gtk
 WINDOW_WIDTH = 700
 WINDOW_HEIGHT = 400
 TXN_PATH = './Data/Transactions_test.csv'
-txn_input_form = txnInput.TransactionInputForm(WINDOW_HEIGHT, TXN_PATH)
+txn_input_form = txnInput.TransactionInputForm(WINDOW_WIDTH, WINDOW_HEIGHT, TXN_PATH)
 
 
 def on_activate(application: Gtk.Application):

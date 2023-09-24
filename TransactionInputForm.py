@@ -16,7 +16,7 @@ class TransactionInputForm(Gtk.Box):
     category_input.set_entry_text_column(0)
     description_input = Gtk.Entry(placeholder_text="Description")
 
-    def __init__(self, window_height, txn_list_path):
+    def __init__(self, window_width, window_height, txn_list_path):
         super().__init__(width_request=225,
                          height_request=window_height,
                          orientation=Gtk.Orientation.VERTICAL,
@@ -32,7 +32,7 @@ class TransactionInputForm(Gtk.Box):
         self.submit.connect("clicked", self.on_submit)
         self.append(self.submit)
 
-        self.txn_list = TransactionList(txn_file_path=txn_list_path)
+        self.txn_list = TransactionList(width=window_width-225-45, height=window_height, txn_file_path=txn_list_path)
 
         loc_model = Gtk.ListStore(str)
         for loc in self.txn_list.locations():

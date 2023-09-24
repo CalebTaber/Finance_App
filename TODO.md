@@ -7,7 +7,7 @@
 - [ ] Restrict amount input field to be numeric -- [Insert-Text Signal](https://docs.gtk.org/gtk4/signal.Editable.insert-text.html)
 - [X] Pass list of locations from data to form
 - [X] Pass list of categories from data to form
-- [ ] Connect transaction submission to data
+- [X] Connect transaction submission to data
 - [X] Add completion to location and category dropdowns -- [Doc](https://docs.gtk.org/gtk3/class.EntryCompletion.html)
   
 

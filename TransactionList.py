@@ -16,7 +16,7 @@ class TransactionListItem(Gtk.Box):
 
 
 class TransactionList:
-    def __init__(self, txn_file_path: str):
+    def __init__(self, width, height, txn_file_path: str):
         self.file_path = txn_file_path
         self.transaction_df = pd.read_csv(filepath_or_buffer=txn_file_path, sep=';')
 
@@ -29,11 +29,11 @@ class TransactionList:
         self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].apply(str.split, sep=',')
 
         # Set up list widget
-        self.list_widget = Gtk.ScrolledWindow(width_request=430,
-                                              height_request=400,
+        self.list_widget = Gtk.ScrolledWindow(width_request=width,
+                                              height_request=height,
                                               hscrollbar_policy=Gtk.PolicyType.NEVER,
                                               vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
-                                              max_content_height=400)
+                                              max_content_height=height)
 
         vbox = Gtk.Box(spacing=5, orientation=Gtk.Orientation.VERTICAL)
         for i in range(len(self.transaction_df)):
@@ -64,6 +64,3 @@ class TransactionList:
         self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].map(lambda x: ','.join(x)).map(str.lower)
         self.transaction_df.sort_values(by='Date', inplace=True)
         self.transaction_df.to_csv(path_or_buf=self.file_path, index=False, sep=';')
-
-    def display_list(self) -> Gtk.ScrolledWindow:
-        return
