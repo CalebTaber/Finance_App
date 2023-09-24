@@ -1,13 +1,13 @@
 import gi
-from DatePicker import DatePicker
 from TransactionList import TransactionList
+from datetime import date
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
 
 class TransactionInputForm(Gtk.Box):
-    date_input = DatePicker()
+    date_input = Gtk.Calendar(visible=True)
     amount_input = Gtk.Entry(placeholder_text="Amount")
     submit = Gtk.Button(label="Submit")
     location_input = Gtk.ComboBoxText.new_with_entry()
@@ -17,11 +17,11 @@ class TransactionInputForm(Gtk.Box):
     description_input = Gtk.Entry(placeholder_text="Description")
 
     def __init__(self, window_height, txn_list_path):
-        super().__init__()
-        self.set_size_request(225, window_height)
-        self.set_orientation(Gtk.Orientation.VERTICAL)
-        self.set_spacing(5)
-        self.set_homogeneous(False)
+        super().__init__(width_request=225,
+                         height_request=window_height,
+                         orientation=Gtk.Orientation.VERTICAL,
+                         spacing=5,
+                         homogeneous=False)
 
         self.append(self.date_input)
         self.append(self.amount_input)
@@ -57,7 +57,11 @@ class TransactionInputForm(Gtk.Box):
         self.category_input.get_child().set_completion(cat_completion)
 
     def on_submit(self, widget):
-        self.txn_list.add_transaction([self.date_input.selected_date,
+        txn_date = date(year=self.date_input.get_date().get_year(),
+                        month=self.date_input.get_date().get_month(),
+                        day=self.date_input.get_date().get_day_of_month())
+
+        self.txn_list.add_transaction([txn_date,
                                        self.amount_input.get_text(),
                                        self.location_input.get_active_text(),
                                        self.category_input.get_active_text(),

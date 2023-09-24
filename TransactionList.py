@@ -6,14 +6,48 @@ from datetime import date
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
+
+class TransactionListItem(Gtk.Box):
+    def __init__(self, fields):
+        super().__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=10, homogeneous=False)
+
+        for item in fields:
+            self.append(Gtk.Entry(buffer=Gtk.EntryBuffer(text=item)))
+
+
 class TransactionList:
-    def __init__(self, txn_file_path):
+    def __init__(self, txn_file_path: str):
         self.file_path = txn_file_path
         self.transaction_df = pd.read_csv(filepath_or_buffer=txn_file_path, sep=';')
+
+        # Ensure the input file has the correct schema
         for col_name in ['Date', 'Amount', 'Location', 'Category', 'Description Keywords']:
             assert col_name in self.transaction_df.columns
+
+        # Format columns after reading from file
         self.transaction_df['Date'] = self.transaction_df['Date'].map(lambda x: date.fromisoformat(x))
         self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].apply(str.split, sep=',')
+
+        # Set up list widget
+        self.list_widget = Gtk.ScrolledWindow(width_request=430,
+                                              height_request=400,
+                                              hscrollbar_policy=Gtk.PolicyType.NEVER,
+                                              vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
+                                              max_content_height=400)
+
+        vbox = Gtk.Box(spacing=5, orientation=Gtk.Orientation.VERTICAL)
+        for i in range(len(self.transaction_df)):
+            row = self.transaction_df.iloc[i]
+
+            row_item = TransactionListItem([str(row['Date'].strftime("%m-%d-%y")),
+                                            str(row['Amount']),
+                                            str(row['Location']),
+                                            str(row['Category'])])
+
+            vbox.prepend(row_item)
+            vbox.prepend(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+
+        self.list_widget.set_child(vbox)
 
     def categories(self):
         return np.sort(self.transaction_df['Category'].unique())
@@ -23,9 +57,8 @@ class TransactionList:
         return np.sort([loc for loc in locations if loc != np.NaN])
 
     def add_transaction(self, values: list):
-        (txn_date, amount, location, category, keywords) = values
-        self.transaction_df.loc[len(self.transaction_df)] = [txn_date, amount, location, category, keywords]
-        print('Added the following transaction:', values)
+        self.transaction_df.loc[len(self.transaction_df)] = values
+        self.list_widget.get_child().get_child().prepend(TransactionListItem(values[:-1]))
 
     def write_to_file(self):
         self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].map(lambda x: ','.join(x)).map(str.lower)
@@ -33,24 +66,4 @@ class TransactionList:
         self.transaction_df.to_csv(path_or_buf=self.file_path, index=False, sep=';')
 
     def display_list(self) -> Gtk.ScrolledWindow:
-        window = Gtk.ScrolledWindow()
-        window.set_size_request(430, 400)
-        window.set_policy(hscrollbar_policy=Gtk.PolicyType.NEVER, vscrollbar_policy=Gtk.PolicyType.AUTOMATIC)
-
-        vbox = Gtk.Box()
-        vbox.set_orientation(Gtk.Orientation.VERTICAL)
-        for i in range(len(self.transaction_df)):
-            row = self.transaction_df.iloc[i]
-            new_label = Gtk.Label()
-
-            new_label.set_text(str(row['Date'].strftime("%m-%d-%y")) + "\t"
-                               + str(row['Amount']) + "\t"
-                               + str(row['Location']) + "\t"
-                               + str(row['Category']))
-            vbox.append(new_label)
-            hseparator = Gtk.Separator()
-            hseparator.set_orientation(Gtk.Orientation.HORIZONTAL)
-            vbox.append(hseparator)
-
-        window.set_child(vbox)
-        return window
+        return

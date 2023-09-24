@@ -14,11 +14,11 @@ def on_activate(application: Gtk.Application):
     top_level_layout = Gtk.FlowBox()
     top_level_layout.set_orientation(Gtk.Orientation.HORIZONTAL)
     top_level_layout.append(txn_input_form)
-    top_level_layout.append(txn_input_form.txn_list.display_list())
+    top_level_layout.append(txn_input_form.txn_list.list_widget)
 
     app_window = Gtk.ApplicationWindow(application=application)
     app_window.set_title('Finance App')
-    app_window.set_default_size(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
+    app_window.set_size_request(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
     app_window.set_child(top_level_layout)
     app_window.present()
 

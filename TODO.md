@@ -4,7 +4,7 @@
   - [X] Perform regression testing
 
 ### Transaction Input Form (3/5)
-- [ ] Restrict amount input field to be numeric
+- [ ] Restrict amount input field to be numeric -- [Insert-Text Signal](https://docs.gtk.org/gtk4/signal.Editable.insert-text.html)
 - [X] Pass list of locations from data to form
 - [X] Pass list of categories from data to form
 - [ ] Connect transaction submission to data
@@ -17,7 +17,8 @@
   - [X] List transactions
   - [ ] Allow all fields to be edited
   - [ ] Allow deletion of transactions
-  - [ ] Update in real-time when transactions are added to the list  
+  - [ ] Update in real-time when transactions are added to the list
+    - [ ] Sort list according to transaction date (map/df of date->TransactionListItem?)
 - [X] Transaction adding function
 - [ ] Transaction deleting function
 - [ ] Transaction writing function
