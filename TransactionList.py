@@ -22,7 +22,8 @@ class TransactionList:
 
         # Ensure the input file has the correct schema
         for col_name in ['Date', 'Amount', 'Location', 'Category', 'Description Keywords']:
-            assert col_name in self.transaction_df.columns
+            if col_name not in self.transaction_df.columns:
+                raise Exception("Invalid data file schema input to TransactionList object constructor:", self.transaction_df.columns)
 
         # Format columns after reading from file
         self.transaction_df['Date'] = self.transaction_df['Date'].map(lambda x: date.fromisoformat(x))
