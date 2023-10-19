@@ -12,7 +12,7 @@ class TransactionListItem(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=10, homogeneous=False)
 
         for item in fields:
-            self.append(Gtk.Entry(buffer=Gtk.EntryBuffer(text=item)))
+            self.append(Gtk.Label(label=item))
 
 
 class TransactionList:

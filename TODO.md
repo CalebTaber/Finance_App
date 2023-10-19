@@ -3,7 +3,8 @@
   - [X] Refactor custom widgets for gtk4
   - [X] Perform regression testing
 
-### Transaction Input Form (3/5)
+
+### Transaction Input Form (4/5)
 - [ ] Restrict amount input field to be numeric -- [Insert-Text Signal](https://docs.gtk.org/gtk4/signal.Editable.insert-text.html)
 - [X] Pass list of locations from data to form
 - [X] Pass list of categories from data to form
