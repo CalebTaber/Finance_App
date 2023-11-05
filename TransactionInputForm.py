@@ -20,8 +20,8 @@ class TransactionInputForm(Gtk.Box):
         self.date_input = Gtk.Calendar(visible=True)
         self.amount_input = Gtk.Entry(placeholder_text="Amount")
         self.submit = Gtk.Button(label="Submit")
-        self.location_input = Utilities.combobox_text_with_entry_completion(values=[x for x in self.txn_list.locations() if x != 'nan'], text_column=0)
-        self.category_input = Utilities.combobox_text_with_entry_completion(values=[x for x in self.txn_list.categories() if x != 'nan'], text_column=0)
+        self.location_input = Utilities.combobox_text_with_entry_completion(completion_values=[x for x in self.txn_list.locations() if x != 'nan'], text_column_index=0)
+        self.category_input = Utilities.combobox_text_with_entry_completion(completion_values=[x for x in self.txn_list.categories() if x != 'nan'], text_column_index=0)
         self.description_input = Gtk.Entry(placeholder_text="Description")
 
         self.append(self.date_input)

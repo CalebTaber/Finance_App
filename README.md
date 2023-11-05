@@ -12,4 +12,3 @@ of transactions.
 - Input monthly budget guidelines and see how your monthly expenditures compare to
 your estimations
 - Editing transaction information once already submitted
-- 

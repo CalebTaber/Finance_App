@@ -36,7 +36,7 @@ class TransactionList:
                                               vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
                                               max_content_height=height)
 
-        vbox = Gtk.Box(spacing=5, orientation=Gtk.Orientation.VERTICAL)
+        list_box = Gtk.ListBox(width_request=width, height_request=height, show_separators=True)
         for i in range(len(self.transaction_df)):
             row = self.transaction_df.iloc[i]
 
@@ -45,10 +45,9 @@ class TransactionList:
                                             str(row['Location']),
                                             str(row['Category'])])
 
-            vbox.prepend(row_item)
-            vbox.prepend(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL))
+            list_box.prepend(row_item)
 
-        self.list_widget.set_child(vbox)
+        self.list_widget.set_child(list_box)
 
     def categories(self):
         return np.sort(self.transaction_df['Category'].unique())
