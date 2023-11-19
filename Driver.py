@@ -4,7 +4,7 @@ import TransactionInputForm as txnInput
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
-WINDOW_WIDTH = 700
+WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 400
 TXN_PATH = './Data/Transactions_test.csv'
 txn_input_form = txnInput.TransactionInputForm(WINDOW_WIDTH, WINDOW_HEIGHT, TXN_PATH)

@@ -19,7 +19,7 @@
 - [X] ~~Create TransactionList class to wrap functionality~~
 - [ ] Method that returns a scrollable grid 
   - [X] ~~List transactions~~
-  - [ ] Allow all fields to be edited
+  - [X] ~~Allow all fields to be edited~~
   - [ ] Button to delete transaction
   - [ ] Update in real-time when transactions are added to the list
     - [ ] Sort list according to transaction date (map/df of date->TransactionListItem?)
