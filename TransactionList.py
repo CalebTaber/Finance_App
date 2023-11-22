@@ -82,6 +82,15 @@ class TransactionListItem(Gtk.Box):
         self.append(self.category_label)
 
 
+def compare_dates(date1: date, date2: date) -> int:
+    if date1 < date2:
+        return 1
+    elif date1 > date2:
+        return -1
+    else:
+        return 0
+
+
 class TransactionList:
     def on_row_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow):
         # Set any previously edited rows as not editable
@@ -100,6 +109,8 @@ class TransactionList:
                     list_item.category_buffer.get_text(),
                     ";".join(self.transaction_df.iloc[len(self.transaction_df) - 1 - self.selected_row_index]['Description Keywords'])]
 
+                box.get_row_at_index(self.selected_row_index).changed()
+
             # Set newly selected row to be editable
             self.selected_row_index = row.get_index()
             row.get_child().set_editable(True)
@@ -113,7 +124,7 @@ class TransactionList:
 
     def add_transaction(self, values: list):
         self.transaction_df.loc[len(self.transaction_df)] = values
-        self.list_widget.get_child().get_child().prepend(TransactionListItem(values[:-1]))
+        self.list_widget.get_child().get_child().prepend(TransactionListItem([str(values[0].strftime("%m-%d-%y")), str(values[1]), str(values[2]), str(values[3])]))
 
     def write_to_file(self):
         self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].map(lambda x: ','.join(x)).map(str.lower)
@@ -142,7 +153,15 @@ class TransactionList:
                                               vscrollbar_policy=Gtk.PolicyType.AUTOMATIC,
                                               max_content_height=height)
 
-        self.list_box = Gtk.ListBox(width_request=width, height_request=height, show_separators=True, activate_on_single_click=False)
+        self.list_box = Gtk.ListBox(width_request=width,
+                                    height_request=height,
+                                    show_separators=True,
+                                    activate_on_single_click=False
+                                    )
+        self.list_box.set_sort_func(lambda row1, row2:
+                                    compare_dates(datetime.strptime(row1.get_child().date_buffer.get_text(), "%m-%d-%y").date(),
+                                                  datetime.strptime(row2.get_child().date_buffer.get_text(), "%m-%d-%y").date()))
+
         for i in range(len(self.transaction_df)):
             row = self.transaction_df.iloc[i]
 
