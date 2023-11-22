@@ -2,13 +2,21 @@ import gi
 import pandas as pd
 import numpy as np
 from datetime import date
+from datetime import datetime
+from functools import partial
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
+NO_ROW = -1
+
+
+def delete_transaction(transaction_index: int) -> None:
+    print(transaction_index)
+
 
 class TransactionListItem(Gtk.Box):
-    def set_editable(self, make_editable):
+    def set_editable(self, make_editable: bool) -> None:
         if self.editable is False and make_editable is True:
             # Remove the label widgets
             self.remove(self.date_label)
@@ -17,7 +25,6 @@ class TransactionListItem(Gtk.Box):
             self.remove(self.category_label)
 
             # Add the Entry widgets
-            self.append(self.done_checkmark)
             self.append(self.date_input)
             self.append(self.amount_input)
             self.append(self.location_input)
@@ -30,7 +37,6 @@ class TransactionListItem(Gtk.Box):
             self.remove(self.amount_input)
             self.remove(self.location_input)
             self.remove(self.category_input)
-            self.remove(self.done_checkmark)
 
             # Update the displayed values
             self.date_label.set_label(self.date_buffer.get_text())
@@ -46,7 +52,7 @@ class TransactionListItem(Gtk.Box):
 
             self.editable = False
 
-    def __init__(self, fields):
+    def __init__(self, fields: list):
         super().__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=5, homogeneous=False)
         self.set_homogeneous(False)
 
@@ -67,7 +73,6 @@ class TransactionListItem(Gtk.Box):
         self.amount_input = Gtk.Entry.new_with_buffer(buffer=self.amount_buffer)
         self.location_input = Gtk.Entry.new_with_buffer(buffer=self.location_buffer)
         self.category_input = Gtk.Entry.new_with_buffer(buffer=self.category_buffer)
-        self.done_checkmark = Gtk.Label(label="  ✅ ")
 
         # Initialize as non-editable with the Label widgets displayed
         self.editable = False
@@ -77,31 +82,45 @@ class TransactionListItem(Gtk.Box):
         self.append(self.category_label)
 
 
-NO_ROW = -1
-
-
 class TransactionList:
-    def on_row_selected(self, box, row):
-        print("previous selection:", self.selected_row_index)
-        # If row is current selected, set to be non-editable and set current to NO_ROW
-        # If row is not current selected, set current selected to non-editable, set current selected to be this row, and set this row to be editable
-
+    def on_row_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow):
         # Set any previously edited rows as not editable
         if row is not None:
-            if row.get_index() == self.selected_row_index:
-                # If current selected row is selected again, set it to non-editable and change the selected row to NO_ROW
-                box.get_row_at_index(self.selected_row_index).get_child().set_editable(False)
-                self.selected_row_index = NO_ROW
-            else:
-                # If a different row is selected, set the currently selected row to non-editable and set the newly selected row to editable
-                if self.selected_row_index != NO_ROW:
-                    box.get_row_at_index(self.selected_row_index).get_child().set_editable(False)
+            print("selection")
+            # If a row is selected, set the currently selected row to non-editable and save its new values
+            if self.selected_row_index != NO_ROW:
+                list_item = box.get_row_at_index(self.selected_row_index).get_child()
+                list_item.set_editable(False)
 
-                self.selected_row_index = row.get_index()
-                print("row", self.selected_row_index, "selected")
-                row.get_child().set_editable(True)
+                self.transaction_df.iloc[
+                    len(self.transaction_df) - 1 - self.selected_row_index] = [
+                    datetime.strptime(list_item.date_buffer.get_text(), "%m-%d-%y").date(),
+                    float(list_item.amount_buffer.get_text()),
+                    list_item.location_buffer.get_text(),
+                    list_item.category_buffer.get_text(),
+                    ";".join(self.transaction_df.iloc[len(self.transaction_df) - 1 - self.selected_row_index]['Description Keywords'])]
 
-    def __init__(self, width, height, txn_file_path: str):
+            # Set newly selected row to be editable
+            self.selected_row_index = row.get_index()
+            row.get_child().set_editable(True)
+
+    def categories(self):
+        return np.sort(self.transaction_df['Category'].unique())
+
+    def locations(self):
+        locations = self.transaction_df['Location'].unique()
+        return np.sort([loc for loc in locations if loc != np.NaN])
+
+    def add_transaction(self, values: list):
+        self.transaction_df.loc[len(self.transaction_df)] = values
+        self.list_widget.get_child().get_child().prepend(TransactionListItem(values[:-1]))
+
+    def write_to_file(self):
+        self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].map(lambda x: ','.join(x)).map(str.lower)
+        self.transaction_df.sort_values(by='Date', inplace=True)
+        self.transaction_df.to_csv(path_or_buf=self.file_path, index=False, sep=';')
+
+    def __init__(self, width: int, height: int, txn_file_path: str):
         self.file_path = txn_file_path
         self.transaction_df = pd.read_csv(filepath_or_buffer=txn_file_path, sep=';')
 
@@ -113,6 +132,8 @@ class TransactionList:
         # Format columns after reading from file
         self.transaction_df['Date'] = self.transaction_df['Date'].map(lambda x: date.fromisoformat(x))
         self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].apply(str.split, sep=',')
+
+        self.to_delete = -1
 
         # Set up list widget
         self.list_widget = Gtk.ScrolledWindow(width_request=width,
@@ -136,19 +157,3 @@ class TransactionList:
 
         self.list_box.connect("row_selected", self.on_row_selected)
         self.list_widget.set_child(self.list_box)
-
-    def categories(self):
-        return np.sort(self.transaction_df['Category'].unique())
-
-    def locations(self):
-        locations = self.transaction_df['Location'].unique()
-        return np.sort([loc for loc in locations if loc != np.NaN])
-
-    def add_transaction(self, values: list):
-        self.transaction_df.loc[len(self.transaction_df)] = values
-        self.list_widget.get_child().get_child().prepend(TransactionListItem(values[:-1]))
-
-    def write_to_file(self):
-        self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].map(lambda x: ','.join(x)).map(str.lower)
-        self.transaction_df.sort_values(by='Date', inplace=True)
-        self.transaction_df.to_csv(path_or_buf=self.file_path, index=False, sep=';')

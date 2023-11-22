@@ -1,4 +1,4 @@
-~~### General (1/1)~~
+### ~~General (1/1)~~
 - [X] ~~Switch to GTK4.0 from GTK3.0~~
   - [X] ~~Refactor custom widgets for gtk4~~
   - [X] ~~Perform regression testing~~
@@ -15,16 +15,15 @@
 - [ ] Switch ComboBoxText to DropDown
   
 
-### Transaction List (3/6)
+### Transaction List (3/5)
 - [X] ~~Create TransactionList class to wrap functionality~~
 - [ ] Method that returns a scrollable grid 
   - [X] ~~List transactions~~
   - [X] ~~Allow all fields to be edited~~
   - [ ] Button to delete transaction
   - [ ] Update in real-time when transactions are added to the list
-    - [ ] Sort list according to transaction date (map/df of date->TransactionListItem?)
+    - [ ] Sort list according to transaction date (ListBox.set_sort_func())
 - [X] ~~Transaction adding function~~
-- [ ] Transaction deleting function
 - [X] ~~Transaction writing function~~
   - [X] ~~Write data to file~~
   - [X] ~~Write data on application exit~~
