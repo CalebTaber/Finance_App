@@ -15,19 +15,18 @@
 - [ ] Switch ComboBoxText to DropDown
   
 
-### Transaction List (3/5)
+### Transaction List (4/4)
 - [X] ~~Create TransactionList class to wrap functionality~~
-- [ ] Method that returns a scrollable grid 
+- [X] ~~Method that returns a scrollable grid~~ 
   - [X] ~~List transactions~~
   - [X] ~~Allow all fields to be edited~~
-  - [ ] Button to delete transaction
-  - [ ] Update in real-time when transactions are added to the list
-    - [ ] Sort list according to transaction date (ListBox.set_sort_func())
+  - [X] ~~Ability to delete transaction~~
+  - [X] ~~Update in real-time when transactions are added to the list~~
+    - [X] ~~Sort list according to transaction date (ListBox.set_sort_func())~~
 - [X] ~~Transaction adding function~~
 - [X] ~~Transaction writing function~~
   - [X] ~~Write data to file~~
   - [X] ~~Write data on application exit~~
-- [ ] Write transaction data to file on a timer (every ~60 seconds)
   
 
 ### Account Balance Input Form
@@ -36,6 +35,7 @@
 - [ ] Plot all account balances on same line graph
 - [ ] Show table of balances (?)
 
+
 ### Dashboard
 - [ ] TODO 
   
@@ -43,3 +43,4 @@
 ### Miscellaneous
 - [ ] Change background color of app
 - [ ] Research CSS for better look and feel
+- [ ] Write transaction data to file on a timer (every ~60 seconds)

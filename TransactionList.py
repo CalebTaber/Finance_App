@@ -25,6 +25,7 @@ class TransactionListItem(Gtk.Box):
             self.remove(self.category_label)
 
             # Add the Entry widgets
+            self.append(self.checkmark_label)
             self.append(self.date_input)
             self.append(self.amount_input)
             self.append(self.location_input)
@@ -33,6 +34,7 @@ class TransactionListItem(Gtk.Box):
             self.editable = True
         elif self.editable is True and make_editable is False:
             # Remove the Entry widgets
+            self.remove(self.checkmark_label)
             self.remove(self.date_input)
             self.remove(self.amount_input)
             self.remove(self.location_input)
@@ -69,6 +71,7 @@ class TransactionListItem(Gtk.Box):
         self.category_label = Gtk.Label(label=self.category_buffer.get_text())
 
         # Entry widgets
+        self.checkmark_label = Gtk.Label(label="✅")
         self.date_input = Gtk.Entry.new_with_buffer(buffer=self.date_buffer)
         self.amount_input = Gtk.Entry.new_with_buffer(buffer=self.amount_buffer)
         self.location_input = Gtk.Entry.new_with_buffer(buffer=self.location_buffer)
@@ -95,25 +98,27 @@ class TransactionList:
     def on_row_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow):
         # Set any previously edited rows as not editable
         if row is not None:
-            print("selection")
+            # Set newly selected row to be editable (if not currently selected)
+            # Do this before setting the previous to non-editable so the next row isn't automatically selected
+            if row.get_index() != self.selected_row_index:
+                row.get_child().set_editable(True)
+
             # If a row is selected, set the currently selected row to non-editable and save its new values
             if self.selected_row_index != NO_ROW:
-                list_item = box.get_row_at_index(self.selected_row_index).get_child()
-                list_item.set_editable(False)
+                current_row = box.get_row_at_index(self.selected_row_index).get_child()
+                current_row.set_editable(False)
 
                 self.transaction_df.iloc[
                     len(self.transaction_df) - 1 - self.selected_row_index] = [
-                    datetime.strptime(list_item.date_buffer.get_text(), "%m-%d-%y").date(),
-                    float(list_item.amount_buffer.get_text()),
-                    list_item.location_buffer.get_text(),
-                    list_item.category_buffer.get_text(),
+                    datetime.strptime(current_row.date_buffer.get_text(), "%m-%d-%y").date(),
+                    float(current_row.amount_buffer.get_text()),
+                    current_row.location_buffer.get_text(),
+                    current_row.category_buffer.get_text(),
                     ";".join(self.transaction_df.iloc[len(self.transaction_df) - 1 - self.selected_row_index]['Description Keywords'])]
 
                 box.get_row_at_index(self.selected_row_index).changed()
 
-            # Set newly selected row to be editable
             self.selected_row_index = row.get_index()
-            row.get_child().set_editable(True)
 
     def categories(self):
         return np.sort(self.transaction_df['Category'].unique())
@@ -129,7 +134,7 @@ class TransactionList:
     def write_to_file(self):
         self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].map(lambda x: ','.join(x)).map(str.lower)
         self.transaction_df.sort_values(by='Date', inplace=True)
-        self.transaction_df.to_csv(path_or_buf=self.file_path, index=False, sep=';')
+        self.transaction_df[self.transaction_df['Amount'] != 0].to_csv(path_or_buf=self.file_path, index=False, sep=';')
 
     def __init__(self, width: int, height: int, txn_file_path: str):
         self.file_path = txn_file_path
