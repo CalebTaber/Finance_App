@@ -9,7 +9,7 @@
 - [X] ~~Pass list of categories from data to form~~
 - [X] ~~Connect transaction submission to data~~
 - [X] ~~Add completion to location and category dropdowns -- [Doc](https://docs.gtk.org/gtk3/class.EntryCompletion.html)~~
-- [ ] Switch ComboBoxText to DropDown
+- [ ] Switch ComboBoxText to DropDown (may not be possible with autocomplete)
   
 
 ### ~~Transaction List (4/4)~~
