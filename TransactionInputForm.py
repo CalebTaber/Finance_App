@@ -7,13 +7,11 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
 
-class TransactionInputForm(Gtk.Box):
+class TransactionInputForm(Gtk.FlowBox):
     def __init__(self, window_width, window_height, txn_list_path):
-        super().__init__(width_request=225,
-                         height_request=window_height,
-                         orientation=Gtk.Orientation.VERTICAL,
-                         spacing=5,
-                         homogeneous=False)
+        super().__init__(orientation=Gtk.Orientation.HORIZONTAL)
+
+        input_controls_container = Gtk.Box(width_request=225, height_request=window_height, orientation=Gtk.Orientation.VERTICAL, spacing=5, homogeneous=False)
 
         self.txn_list = TransactionList(width=window_width-225-45, height=window_height, txn_file_path=txn_list_path)
 
@@ -24,14 +22,17 @@ class TransactionInputForm(Gtk.Box):
         self.category_input = Utilities.combobox_text_with_entry_completion(completion_values=[x for x in self.txn_list.categories() if x != 'nan'], text_column_index=0)
         self.description_input = Gtk.Entry(placeholder_text="Description")
 
-        self.append(self.date_input)
-        self.append(self.amount_input)
-        self.append(self.location_input)
-        self.append(self.category_input)
-        self.append(self.description_input)
+        input_controls_container.append(self.date_input)
+        input_controls_container.append(self.amount_input)
+        input_controls_container.append(self.location_input)
+        input_controls_container.append(self.category_input)
+        input_controls_container.append(self.description_input)
 
         self.submit.connect("clicked", self.on_submit)
-        self.append(self.submit)
+        input_controls_container.append(self.submit)
+
+        self.append(input_controls_container)
+        self.append(self.txn_list.list_widget)
 
     def on_submit(self, widget):
         input_date = self.date_input.get_date()

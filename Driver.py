@@ -11,10 +11,8 @@ txn_input_form = txnInput.TransactionInputForm(WINDOW_WIDTH, WINDOW_HEIGHT, TXN_
 
 
 def on_activate(application: Gtk.Application):
-    top_level_layout = Gtk.FlowBox()
-    top_level_layout.set_orientation(Gtk.Orientation.HORIZONTAL)
-    top_level_layout.append(txn_input_form)
-    top_level_layout.append(txn_input_form.txn_list.list_widget)
+    top_level_layout = Gtk.Notebook()
+    top_level_layout.append_page(txn_input_form, Gtk.Label(label="Transactions"))
 
     app_window = Gtk.ApplicationWindow(application=application)
     app_window.set_title('Finance App')
