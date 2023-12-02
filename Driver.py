@@ -1,37 +1,54 @@
 import gi
 import TransactionInputForm as txnInput
+import Dashboard
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
-WINDOW_WIDTH = 500
+WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 400
+TXN_PATH = '/home/caleb/Documents/Finances/Dashboard/Transactions.csv'
+
+top_level_layout = Gtk.Notebook()
+txn_input_form = txnInput.TransactionInputForm(WINDOW_WIDTH, WINDOW_HEIGHT, TXN_PATH)
+
+dashboard_box = Gtk.FlowBox()
 
 
-# class MainWindow:
-#     layout = Gtk.FlowBox()
-#
-#     def __init__(self):
-#         super().__init__(title="Finance App")
-#         self.set_default_size(500, 400)
-#         self.layout.set_valign(Gtk.Align.START)
-#
-#         self.layout.append(txn_input)
-#
-#         self.append(self.layout)
+def box_remove_all_children(box: Gtk.Box):
+    while box.get_child_at_index(0) is not None:
+        box.remove(box.get_child_at_index(0))
 
 
-def on_activate(app):
-    win = Gtk.ApplicationWindow(application=app)
-    layout = Gtk.FlowBox()
-    txn_input = txnInput.TransactionInputForm(WINDOW_HEIGHT, '/home/caleb/Documents/Finances/Dashboard/Transactions.csv')
-    layout.append(txn_input)
-    win.set_child(layout)
-    win.present()
+def switch_page(notebook, page, page_num):
+    if page_num == 0:
+        print("Cool")
+    elif page_num == 1:
+        box_remove_all_children(dashboard_box)
+        dashboard_box.append(Dashboard.show(txn_input_form.txn_list.transaction_df, WINDOW_WIDTH, WINDOW_HEIGHT))
+    else:
+        print("not 0 or 1")
 
 
-app = Gtk.Application(application_id='com.example.GtkApplication')
-app.connect('activate', on_activate)
+def on_activate(application: Gtk.Application):
+    top_level_layout.connect("switch-page", switch_page)
+    top_level_layout.append_page(txn_input_form, Gtk.Label(label="Transactions"))
+    dashboard_box.append(Gtk.Label(label="Test"))
+    top_level_layout.insert_page(dashboard_box, Gtk.Label(label="Dashboard"), 1)
 
-# Run the application
-app.run(None)
+    app_window = Gtk.ApplicationWindow(application=application)
+    app_window.set_title('Finance App')
+    app_window.set_size_request(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
+    app_window.set_child(top_level_layout)
+    app_window.present()
+
+
+def on_exit(window, user_data):
+    txn_input_form.close()
+
+
+main_application = Gtk.Application(application_id='com.example.GtkApplication')
+main_application.connect('activate', on_activate)
+main_application.connect('window-removed', on_exit)
+
+main_application.run(None)
