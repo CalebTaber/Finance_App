@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import date
 from datetime import datetime
-from Utilities import compare_dates
+from Utilities import compare_transactions
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
@@ -93,7 +93,6 @@ class TransactionList:
 
         # Format columns after reading from file
         self.transaction_df['Date'] = self.transaction_df['Date'].map(lambda x: date.fromisoformat(x))
-        self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].apply(str.split, sep=',')
 
         self.to_delete = -1
 
@@ -109,9 +108,8 @@ class TransactionList:
                                     show_separators=True,
                                     activate_on_single_click=False
                                     )
-        self.list_box.set_sort_func(lambda row1, row2:
-                                    compare_dates(datetime.strptime(row1.get_child().date_buffer.get_text(), "%m-%d-%y").date(),
-                                                  datetime.strptime(row2.get_child().date_buffer.get_text(), "%m-%d-%y").date()))
+        self.list_box.set_sort_func(lambda row1, row2: compare_transactions(row1.get_child(), row2.get_child()))
+        # self.list_box.set_filter_func(lambda row1: float(row1.get_child().amount_buffer.get_text()) != 0)
 
         for i in range(len(self.transaction_df)):
             row = self.transaction_df.iloc[i]
@@ -129,7 +127,6 @@ class TransactionList:
         self.list_widget.set_child(self.list_box)
 
     def on_row_selected(self, box: Gtk.ListBox, row: Gtk.ListBoxRow):
-        # Set any previously edited rows as not editable
         if row is not None:
             # Set newly selected row to be editable (if not currently selected)
             # Do this before setting the previous to non-editable so the next row isn't automatically selected
@@ -141,17 +138,16 @@ class TransactionList:
                 current_row = box.get_row_at_index(self.selected_row_index).get_child()
                 current_row.set_editable(False)
 
-                self.transaction_df.iloc[
-                    len(self.transaction_df) - 1 - self.selected_row_index] = [
+                self.transaction_df.iloc[len(self.transaction_df) - 1 - self.selected_row_index] = [
                     datetime.strptime(current_row.date_buffer.get_text(), "%m-%d-%y").date(),
                     float(current_row.amount_buffer.get_text()),
                     current_row.location_buffer.get_text(),
                     current_row.category_buffer.get_text(),
-                    ";".join(self.transaction_df.iloc[len(self.transaction_df) - 1 - self.selected_row_index]['Description Keywords'])]
+                    self.transaction_df.iloc[len(self.transaction_df) - 1 - self.selected_row_index]['Description Keywords']]
 
                 box.get_row_at_index(self.selected_row_index).changed()
 
-            self.selected_row_index = row.get_index()
+            self.selected_row_index = row.get_index() if self.selected_row_index != row.get_index() else NO_ROW
 
     def categories(self):
         return np.sort(self.transaction_df['Category'].unique())
@@ -165,6 +161,5 @@ class TransactionList:
         self.list_widget.get_child().get_child().prepend(TransactionListItem([str(values[0].strftime("%m-%d-%y")), str(values[1]), str(values[2]), str(values[3])]))
 
     def write_to_file(self):
-        self.transaction_df['Description Keywords'] = self.transaction_df['Description Keywords'].map(lambda x: ','.join(x)).map(str.lower)
         self.transaction_df.sort_values(by='Date', inplace=True)
         self.transaction_df[self.transaction_df['Amount'] != 0].to_csv(path_or_buf=self.file_path, index=False, sep=';')

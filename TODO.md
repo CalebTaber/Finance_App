@@ -12,7 +12,7 @@
 - [ ] Switch ComboBoxText to DropDown (may not be possible with autocomplete)
   
 
-### ~~Transaction List (4/4)~~
+### Transaction List (6/7)
 - [X] ~~Create TransactionList class to wrap functionality~~
 - [X] ~~Method that returns a scrollable grid~~ 
   - [X] ~~List transactions~~
@@ -24,7 +24,10 @@
 - [X] ~~Transaction writing function~~
   - [X] ~~Write data to file~~
   - [X] ~~Write data on application exit~~
-  
+- [X] ~~Add filter to list so transactions with amount==0 are not shown~~
+- [X] ~~Fix formatting of df row when editing a transaction~~
+- [ ] Format list items more uniformly
+
 
 ### Account Balance Input Form
 - [ ] Create form to input account name, balance, and date

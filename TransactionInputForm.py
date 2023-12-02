@@ -44,8 +44,8 @@ class TransactionInputForm(Gtk.FlowBox):
                                        self.amount_input.get_text(),
                                        self.location_input.get_active_text(),
                                        self.category_input.get_active_text(),
-                                       [self.category_input.get_active_text().lower()] +
-                                       self.description_input.get_text().split(',')])
+                                       self.category_input.get_active_text().lower() +
+                                       self.description_input.get_text()])
 
     def close(self):
         self.txn_list.write_to_file()
