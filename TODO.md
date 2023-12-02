@@ -12,7 +12,7 @@
 - [ ] Switch ComboBoxText to DropDown (may not be possible with autocomplete)
   
 
-### Transaction List (6/7)
+### Transaction List (5/6)
 - [X] ~~Create TransactionList class to wrap functionality~~
 - [X] ~~Method that returns a scrollable grid~~ 
   - [X] ~~List transactions~~
@@ -24,7 +24,6 @@
 - [X] ~~Transaction writing function~~
   - [X] ~~Write data to file~~
   - [X] ~~Write data on application exit~~
-- [X] ~~Add filter to list so transactions with amount==0 are not shown~~
 - [X] ~~Fix formatting of df row when editing a transaction~~
 - [ ] Format list items more uniformly
 
@@ -37,14 +36,14 @@
 
 ### Dashboard
 - [ ] Can choose start and end months for data subsets
-- [ ] Income and expenses line graph
-- [ ] Income and expenses MoM change bar chart
+- [X] Income and expenses line graph
+- [X] Income and expenses MoM change bar chart
 - [ ] Expenses breakdown sunburst chart
   - [ ] Show percentages on major category labels
   - [ ] Show sunburst charts for every month within date range?
-- [ ] Income breakdown chart
-- [ ] Account balances line graph
-- [ ] Account balances MoM change bar chart
+- [X] Income breakdown sunburst chart
+- [X] Account balances line graph
+- [X] Account balances MoM change bar chart
 
 
 ### Budget Manager
