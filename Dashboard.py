@@ -40,9 +40,13 @@ def generate_monthly_end_dates(begin_date: date, end_date: date):
             if (year == begin_date.year) and (month < begin_date.month + 1):
                 continue
             if (year == end_date.year) and (month > end_date.month + 1):
-                break  # Add 1 to end_date.month because we want to have the last end date be the first day of the next month without any recorded data
+                break
+                # Add 1 to end_date.month because we want to have the last end date be the first day of the next month without any recorded data
 
             end_dates.append(date(year=year, month=month, day=1))
+
+        if (year == end_date.year) and (end_date.month == 12):
+            end_dates.append(date(year=year+1, month=1, day=1))
 
     return end_dates
 
@@ -218,7 +222,7 @@ def plot_agged_cats(agged_cat_df: pd.DataFrame, width: int, height: int):
     agged_cat_df['GeneralCategory'] = agged_cat_df['SpecificCategory'].map(specific_to_general)
 
     current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == max(agged_cat_df['Plot_Date'])]
-    current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == '23-11']
+    # current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == '23-11']
 
     # TODO don't get agged_cat_df from agg_by_cat(). It takes a simple sum of the category; it does not keep expenses and incomes separate
 
@@ -259,7 +263,8 @@ def plot_acct_balances_mom(acct_balances: pd.DataFrame, width: int, height: int)
 
 def show(transactions: pd.DataFrame, width: int, height: int):
     start_date = date(year=2023, month=7, day=1)
-    end_date = transactions['Date'].max()
+    end_date = transactions['Date'].max() + timedelta(days=1)
+    print(start_date, end_date)
 
     # Income and Expenses
     inc_exp_summary = summarize_income_and_expenses(transactions, start_date, end_date)
@@ -268,7 +273,7 @@ def show(transactions: pd.DataFrame, width: int, height: int):
     raw_inc_exp_linegraph = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/raw_inc_exp.png"))
     mom_inc_exp_barchart = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/mom_inc_exp.png"))
 
-    agged_by_cat = agg_by_cat(transactions, date(year=2023, month=7, day=1), date(year=2023, month=12, day=1))
+    agged_by_cat = agg_by_cat(transactions, start_date, end_date)
     plot_agged_cats(agged_by_cat, 600, 600)
     expenses_sunburst = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/expenses_agged_by_cat.png"))
     income_sunburst = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/income_agged_by_cat.png"))
@@ -280,7 +285,7 @@ def show(transactions: pd.DataFrame, width: int, height: int):
     raw_acct_balances_linegraph = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/raw_acct_balances.png"))
     mom_acct_balances_barchart = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/mom_acct_balances.png"))
 
-    window = Gtk.ScrolledWindow(max_content_width=width, min_content_width=width, max_content_height=height, min_content_height=height)
+    window = Gtk.ScrolledWindow(max_content_width=width*2, min_content_width=width*2, max_content_height=height*2, min_content_height=height*2)
     container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     container.set_size_request(width=width, height=height * 6) # Height factor is the number of plots being displayed
 
