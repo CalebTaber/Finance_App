@@ -36,14 +36,13 @@
 
 ### Dashboard
 - [ ] Can choose start and end months for data subsets
-- [X] Income and expenses line graph
-- [X] Income and expenses MoM change bar chart
-- [ ] Expenses breakdown sunburst chart
-  - [ ] Show percentages on major category labels
-  - [ ] Show sunburst charts for every month within date range?
-- [X] Income breakdown sunburst chart
-- [X] Account balances line graph
-- [X] Account balances MoM change bar chart
+- [X] ~~Income and expenses line graph~~
+- [X] ~~Income and expenses MoM change bar chart~~
+- [X] ~~Expenses breakdown sunburst chart~~
+  - [X] ~~Show percentages on major category labels~~
+- [X] ~~Income breakdown sunburst chart~~
+- [X] ~~Account balances line graph~~
+- [X] ~~Account balances MoM change bar chart~~
 
 
 ### Budget Manager

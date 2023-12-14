@@ -44,6 +44,9 @@ def generate_monthly_end_dates(begin_date: date, end_date: date):
 
             end_dates.append(date(year=year, month=month, day=1))
 
+        if (year == end_date.year) and (end_date.month == 12):
+            end_dates.append(date(year=end_date.year+1, month=1, day=1))
+
     return end_dates
 
 
@@ -217,8 +220,8 @@ def plot_agged_cats(agged_cat_df: pd.DataFrame, width: int, height: int):
     agged_cat_df = agged_cat_df.rename(columns={'Category': 'SpecificCategory'})
     agged_cat_df['GeneralCategory'] = agged_cat_df['SpecificCategory'].map(specific_to_general)
 
-    current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == max(agged_cat_df['Plot_Date'])]
-    current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == '23-11']
+    current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == agged_cat_df['Plot_Date'].max()]
+    # current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == '23-11']
 
     # TODO don't get agged_cat_df from agg_by_cat(). It takes a simple sum of the category; it does not keep expenses and incomes separate
 
@@ -227,9 +230,11 @@ def plot_agged_cats(agged_cat_df: pd.DataFrame, width: int, height: int):
     curr_exp_df['Sum'] = curr_exp_df['Sum'].map(abs)
 
     exp_fig = px.sunburst(curr_exp_df, path=['GeneralCategory', 'SpecificCategory'], values='Sum', width=width, height=height)
+    exp_fig.update_traces(textinfo="label+percent parent+value")
     exp_fig.write_image("Figures/expenses_agged_by_cat.png")
 
     inc_fig = px.sunburst(curr_inc_df, path=['GeneralCategory', 'SpecificCategory'], values='Sum', width=width, height=height)
+    inc_fig.update_traces(textinfo="label+percent parent+value")
     inc_fig.write_image("Figures/income_agged_by_cat.png")
 
 
@@ -265,23 +270,23 @@ def show(transactions: pd.DataFrame, width: int, height: int):
     inc_exp_summary = summarize_income_and_expenses(transactions, start_date, end_date)
     plot_raw_inc_exp(inc_exp_summary, width, height)
     plot_mom_inc_exp(inc_exp_summary, width, height)
-    raw_inc_exp_linegraph = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/raw_inc_exp.png"))
-    mom_inc_exp_barchart = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/mom_inc_exp.png"))
+    raw_inc_exp_linegraph = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/raw_inc_exp.png"), can_shrink=False)
+    mom_inc_exp_barchart = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/mom_inc_exp.png"), can_shrink=False)
 
-    agged_by_cat = agg_by_cat(transactions, date(year=2023, month=7, day=1), date(year=2023, month=12, day=1))
-    plot_agged_cats(agged_by_cat, 600, 600)
-    expenses_sunburst = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/expenses_agged_by_cat.png"))
-    income_sunburst = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/income_agged_by_cat.png"))
+    agged_by_cat = agg_by_cat(transactions, start_date, end_date)
+    plot_agged_cats(agged_by_cat, width, width)
+    expenses_sunburst = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/expenses_agged_by_cat.png"), can_shrink=False)
+    income_sunburst = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/income_agged_by_cat.png"), can_shrink=False)
 
     # Account Balances
     acct_balances = records_within_range(get_acct_balances('/home/caleb/Documents/Finances/Dashboard/AccountBalances.csv'), start_date, end_date)
     plot_acct_balances(acct_balances, width, height)
     plot_acct_balances_mom(acct_balances, width, height)
-    raw_acct_balances_linegraph = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/raw_acct_balances.png"))
-    mom_acct_balances_barchart = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/mom_acct_balances.png"))
+    raw_acct_balances_linegraph = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/raw_acct_balances.png"), can_shrink=False)
+    mom_acct_balances_barchart = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/mom_acct_balances.png"), can_shrink=False)
 
-    window = Gtk.ScrolledWindow(max_content_width=width, min_content_width=width, max_content_height=height, min_content_height=height)
-    container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+    window = Gtk.ScrolledWindow(max_content_width=width, min_content_width=width, max_content_height=height*2, min_content_height=height*2)
+    container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, homogeneous=False)
     container.set_size_request(width=width, height=height * 6) # Height factor is the number of plots being displayed
 
     container.append(raw_inc_exp_linegraph)
