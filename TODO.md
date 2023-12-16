@@ -34,8 +34,8 @@
 - [ ] Show table of balances (?)
 
 
-### Dashboard
-- [ ] Can choose start and end months for data subsets
+### Dashboard (7/7)
+- [X] ~~Can choose start and end months for data subsets~~
 - [X] ~~Income and expenses line graph~~
 - [X] ~~Income and expenses MoM change bar chart~~
 - [X] ~~Expenses breakdown sunburst chart~~
