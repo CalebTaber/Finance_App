@@ -216,13 +216,11 @@ def plot_income_and_expenses_mom(summary_stats: pd.DataFrame, width: int, height
     fig.write_image("Figures/mom_inc_exp.png")
 
 
-def plot_income_expenses_sunbursts(agged_cat_df: pd.DataFrame, width: int, height: int) -> None:
+def plot_income_expenses_sunbursts(agged_cat_df: pd.DataFrame, most_recent_month: bool, width: int, height: int) -> None:
     agged_cat_df = agged_cat_df.rename(columns={'Category': 'SpecificCategory'})
     agged_cat_df['GeneralCategory'] = agged_cat_df['SpecificCategory'].map(specific_to_general)
 
-    current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == agged_cat_df['Plot_Date'].max()]
-
-    # TODO don't get agged_cat_df from agg_by_cat(). It takes a simple sum of the category; it does not keep expenses and incomes separate
+    current_period_df = agged_cat_df[agged_cat_df['Plot_Date'] == agged_cat_df['Plot_Date'].max()] if most_recent_month else agged_cat_df
 
     curr_inc_df = current_period_df[current_period_df['Sum'] >= 0]
     curr_exp_df = current_period_df[current_period_df['Sum'] < 0].copy()
@@ -262,7 +260,7 @@ def plot_account_balances_mom(acct_balances: pd.DataFrame, width: int, height: i
     fig.write_image("Figures/mom_acct_balances.png")
 
 
-def replace_plots(period_transactions: pd.DataFrame, plot_box: Gtk.Box, width: int, height: int):
+def replace_plots(period_transactions: pd.DataFrame, plot_box: Gtk.Box, full_period_sunburst: bool, width: int, height: int):
     # Remove any old plots
     while plot_box.get_first_child() is not None:
         plot_box.remove(plot_box.get_first_child())
@@ -277,7 +275,7 @@ def replace_plots(period_transactions: pd.DataFrame, plot_box: Gtk.Box, width: i
     plot_box.append(mom_inc_exp_barchart)
 
     agged_by_cat = aggregate_by_category(period_transactions)
-    plot_income_expenses_sunbursts(agged_by_cat, width, width)
+    plot_income_expenses_sunbursts(agged_by_cat, not full_period_sunburst, width, width)
     expenses_sunburst = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/expenses_agged_by_cat.png"), can_shrink=False)
     income_sunburst = Gtk.Picture(file=Gio.File.new_for_path(path="./Figures/income_agged_by_cat.png"), can_shrink=False)
     plot_box.append(expenses_sunburst)
@@ -300,7 +298,7 @@ def show(transactions: pd.DataFrame, width: int, height: int):
     months = [str(month_num) for month_num in range(1, 13)]
 
     plots_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-    replace_plots(records_within_range(transactions, date(year=2023, month=7, day=1), transactions['Date'].max()), plots_container, width, height)
+    replace_plots(records_within_range(transactions, date(year=2023, month=7, day=1), transactions['Date'].max() + timedelta(days=1)), plots_container, False, width, height)
 
     start_year = Gtk.DropDown.new_from_strings(years)
     start_year.set_selected(1) # auto-select 2023
@@ -312,6 +310,8 @@ def show(transactions: pd.DataFrame, width: int, height: int):
     end_month = Gtk.DropDown.new_from_strings(months)
     end_month.set_selected(0 if transactions['Date'].max().month == 12 else transactions['Date'].max().month - 1) # default to last month in transactions df
 
+    full_period_sunburst_checkbox = Gtk.CheckButton.new_with_label("Use full period for sunburst charts")
+
     plot_button = Gtk.Button(label="Plot")
     plot_button.connect("clicked", lambda button: replace_plots(records_within_range(transactions,
                                                                                      max(date(year=int(start_year.get_selected_item().get_string()),
@@ -319,8 +319,8 @@ def show(transactions: pd.DataFrame, width: int, height: int):
                                                                                               day=1), transactions['Date'].min()),
                                                                                      min(date(year=int(end_year.get_selected_item().get_string()),
                                                                                               month=int(end_month.get_selected_item().get_string()),
-                                                                                              day=1), transactions['Date'].max())
-                                                                                     ), plots_container, width, height))
+                                                                                              day=1), transactions['Date'].max() + timedelta(days=1))
+                                                                                     ), plots_container, full_period_sunburst_checkbox.get_active(),width, height))
 
     dropdown_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
     dropdown_box.append(Gtk.Label(label="Start: "))
@@ -330,6 +330,7 @@ def show(transactions: pd.DataFrame, width: int, height: int):
     dropdown_box.append(end_month)
     dropdown_box.append(end_year)
     dropdown_box.append(plot_button)
+    dropdown_box.append(full_period_sunburst_checkbox)
 
     window = Gtk.ScrolledWindow(max_content_width=width, min_content_width=width, max_content_height=height * 2, min_content_height=height * 2)
     container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, homogeneous=False)
