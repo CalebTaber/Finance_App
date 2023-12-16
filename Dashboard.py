@@ -82,7 +82,8 @@ def generate_monthly_end_dates(begin_date: date, end_date: date):
             if (year == begin_date.year) and (month < begin_date.month + 1):
                 continue
             if (year == end_date.year) and (month > end_date.month + 1):
-                break  # Add 1 to end_date.month because we want to have the last end date be the first day of the next month without any recorded data
+                break
+                # Add 1 to end_date.month because we want to have the last end date be the first day of the next month without any recorded data
 
             end_dates.append(date(year=year, month=month, day=1))
 
